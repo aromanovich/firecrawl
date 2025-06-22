@@ -45,15 +45,15 @@ export const engines: Engine[] = [
   ...(useIndex ? ["index" as const, "index;documents" as const] : []),
   ...(useFireEngine
     ? [
-        "fire-engine;chrome-cdp" as const,
-        "fire-engine;chrome-cdp;stealth" as const,
-        "fire-engine(retry);chrome-cdp" as const,
-        "fire-engine(retry);chrome-cdp;stealth" as const,
-        "fire-engine;playwright" as const,
-        "fire-engine;playwright;stealth" as const,
-        "fire-engine;tlsclient" as const,
-        "fire-engine;tlsclient;stealth" as const,
-      ]
+      "fire-engine;chrome-cdp" as const,
+      "fire-engine;chrome-cdp;stealth" as const,
+      "fire-engine(retry);chrome-cdp" as const,
+      "fire-engine(retry);chrome-cdp;stealth" as const,
+      "fire-engine;playwright" as const,
+      "fire-engine;playwright;stealth" as const,
+      "fire-engine;tlsclient" as const,
+      "fire-engine;tlsclient;stealth" as const,
+    ]
     : []),
   ...(usePlaywright ? ["playwright" as const] : []),
   "fetch",
@@ -122,7 +122,7 @@ export type EngineScrapeResult = {
   cacheInfo?: {
     created_at: Date;
   };
-  
+
   contentType?: string;
 };
 
@@ -437,7 +437,7 @@ export function buildFallbackList(meta: Meta): {
 }[] {
   const _engines: Engine[] = [
     ...engines,
-    
+
     // enable fire-engine in self-hosted testing environment when mocks are supplied
     ...((!useFireEngine && meta.mock !== null) ? ["fire-engine;chrome-cdp", "fire-engine(retry);chrome-cdp", "fire-engine;chrome-cdp;stealth", "fire-engine(retry);chrome-cdp;stealth", "fire-engine;playwright", "fire-engine;tlsclient", "fire-engine;playwright;stealth", "fire-engine;tlsclient;stealth"] as Engine[] : [])
   ];
@@ -454,17 +454,18 @@ export function buildFallbackList(meta: Meta): {
     && process.env.FIRECRAWL_INDEX_WRITE_ONLY !== "true"
     && !meta.options.formats.includes("changeTracking")
     && meta.options.maxAge !== 0
-    && (
-      meta.options.headers === undefined
-      || Object.keys(meta.options.headers).length === 0
-    )
+    // && (
+    //   meta.options.headers === undefined
+    //   || Object.keys(meta.options.headers).length === 0
+    // )
     && (
       meta.options.actions === undefined
       || meta.options.actions.length === 0
     )
     && meta.options.proxy !== "stealth";
-  
+
   if (!shouldUseIndex) {
+    console.log("Skipping index engine due to options", meta.options);
     const indexIndex = _engines.indexOf("index");
     if (indexIndex !== -1) {
       _engines.splice(indexIndex, 1);
@@ -474,7 +475,7 @@ export function buildFallbackList(meta: Meta): {
       _engines.splice(indexDocumentsIndex, 1);
     }
   }
-  
+
   const prioritySum = [...meta.featureFlags].reduce(
     (a, x) => a + featureFlagOptions[x].priority,
     0,

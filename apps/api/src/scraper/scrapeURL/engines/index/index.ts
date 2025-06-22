@@ -18,13 +18,14 @@ export async function sendDocumentToIndex(meta: Meta, document: Document) {
                 && meta.winnerEngine !== "fetch"
             )
         )
-        && !meta.featureFlags.has("actions")
-        && (
-            meta.options.headers === undefined
-            || Object.keys(meta.options.headers).length === 0
-        );
+        && !meta.featureFlags.has("actions");
+    // && (
+    //     meta.options.headers === undefined
+    //     || Object.keys(meta.options.headers).length === 0
+    // );
 
     if (!shouldCache) {
+        console.log("Skipping caching for URL", meta.url, "Winner Engine:", meta.winnerEngine, "Team ID:", meta.internalOptions.teamId, "Has Actions:", meta.featureFlags.has("actions"));
         return document;
     }
 
@@ -95,11 +96,11 @@ export async function sendDocumentToIndex(meta: Meta, document: Document) {
                     location_country: meta.options.location?.country ?? null,
                     location_languages: meta.options.location?.languages ?? null,
                     status: document.metadata.statusCode,
-                    ...(urlSplitsHash.slice(0, 10).reduce((a,x,i) => ({
+                    ...(urlSplitsHash.slice(0, 10).reduce((a, x, i) => ({
                         ...a,
                         [`url_split_${i}_hash`]: x,
                     }), {})),
-                    ...(domainSplitsHash.slice(0, 5).reduce((a,x,i) => ({
+                    ...(domainSplitsHash.slice(0, 5).reduce((a, x, i) => ({
                         ...a,
                         [`domain_splits_${i}_hash`]: x,
                     }), {})),
@@ -134,7 +135,7 @@ export async function scrapeURLWithIndex(meta: Meta): Promise<EngineScrapeResult
         .gte("created_at", new Date(Date.now() - meta.options.maxAge).toISOString())
         .eq("is_mobile", meta.options.mobile)
         .eq("block_ads", meta.options.blockAds);
-    
+
     if (meta.featureFlags.has("screenshot")) {
         selector = selector.eq("has_screenshot", true);
     }
@@ -188,7 +189,7 @@ export async function scrapeURLWithIndex(meta: Meta): Promise<EngineScrapeResult
     if (!doc) {
         throw new EngineError("Document not found in GCS");
     }
-    
+
     return {
         url: doc.url,
         html: doc.html,
