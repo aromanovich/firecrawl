@@ -3,15 +3,12 @@ package main
 import (
 	"C"
 	// "log"
-
-	md "github.com/tomkosm/html-to-markdown"
-	"github.com/tomkosm/html-to-markdown/plugin"
+	"github.com/JohannesKaufmann/html-to-markdown/v2/converter"
 )
 
 //export ConvertHTMLToMarkdown
 func ConvertHTMLToMarkdown(html *C.char) *C.char {
-	converter := md.NewConverter("", true, nil)
-	converter.Use(plugin.GitHubFlavored())
+	converter := converter.NewConverter()
 
 	markdown, err := converter.ConvertString(C.GoString(html))
 	if err != nil {
