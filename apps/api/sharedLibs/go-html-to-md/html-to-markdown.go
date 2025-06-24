@@ -2,7 +2,9 @@ package main
 
 import (
 	"C"
-	// "log"
+	"fmt"
+	"log"
+
 	"github.com/JohannesKaufmann/html-to-markdown/v2/converter"
 )
 
@@ -12,8 +14,9 @@ func ConvertHTMLToMarkdown(html *C.char) *C.char {
 
 	markdown, err := converter.ConvertString(C.GoString(html))
 	if err != nil {
-		// log.Fatal(err)
+		log.Fatal(err)
 	}
+	fmt.Println("Converted HTML to Markdown:\n", markdown)
 	return C.CString(markdown)
 }
 
